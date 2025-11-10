@@ -1,0 +1,6 @@
+@KoleosDemo_HostAddress = http://localhost:5128
+
+GET {{KoleosDemo_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
