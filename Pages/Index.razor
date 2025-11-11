@@ -1,0 +1,127 @@
+@page "/"
+@inject HttpClient Http
+
+<div class="row g-3">
+    <div class="col-3">
+        <div class="card card-compact">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-users fa-2x text-primary me-3"></i>
+                <div>
+                    <div class="small text-muted">Clientes</div>
+                    <div class="h5 m-0">@totalClientes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card card-compact">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-car fa-2x text-success me-3"></i>
+                <div>
+                    <div class="small text-muted">Vehiculos</div>
+                    <div class="h5 m-0">@totalVehiculos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card card-compact">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-file-invoice-dollar fa-2x text-warning me-3"></i>
+                <div>
+                    <div class="small text-muted">Ordenes recientes</div>
+                    <div class="h5 m-0">@recentCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card card-compact">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-boxes-packing fa-2x text-danger me-3"></i>
+                <div>
+                    <div class="small text-muted">Repuestos</div>
+                    <div class="h5 m-0">@totalRepuestos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <h6>Ordenes recientes</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Vehiculo</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ordenes == null)
+                        {
+                            <tr>
+                                <td colspan="4">Cargando...</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var o in ordenes)
+                            {
+                                <tr>
+                                    <td>@o.Id</td>
+                                    <td>@o.Vehiculo?.Placa</td>
+                                    <td>@o.Estado</td>
+                                    <td>@o.FechaEntrada.ToShortDateString()</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4">
+        <div class="card">
+            <div class="card-body">
+                <h6>Actividad</h6>
+                <ul class="list-unstyled small">
+                    <li>10:23 - Orden #123 creada</li>
+                    <li>09:55 - Repuesto X agregado</li>
+                    <li>08:10 - Cliente nuevo: Juan Perez</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int totalClientes = 0;
+    private int totalVehiculos = 0;
+    private int totalRepuestos = 0;
+    private int recentCount = 0;
+    private List<OrdenServicio>? ordenes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var clientes = await Http.GetFromJsonAsync<List<Cliente>>("/api/clientes");
+            totalClientes = clientes?.Count ?? 0;
+            var veh = await Http.GetFromJsonAsync<List<Vehiculo>>("/api/vehiculos");
+            totalVehiculos = veh?.Count ?? 0;
+            var rep = await Http.GetFromJsonAsync<List<Repuesto>>("/api/repuestos");
+            totalRepuestos = rep?.Count ?? 0;
+            ordenes = await Http.GetFromJsonAsync<List<OrdenServicio>>("/api/ordenes");
+            recentCount = ordenes?.Count ?? 0;
+        }
+        catch
+        {
+            // ignore network errors in demo
+        }
+    }
+}

@@ -169,3 +169,9 @@ C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\obj\Debug\net8.0\refint\Koleos
 C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\obj\Debug\net8.0\KoleosDemo.pdb
 C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\obj\Debug\net8.0\KoleosDemo.genruntimeconfig.cache
 C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\obj\Debug\net8.0\ref\KoleosDemo.dll
+C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\obj\Debug\net8.0\KoleosDemo.RazorAssemblyInfo.cache
+C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\obj\Debug\net8.0\KoleosDemo.RazorAssemblyInfo.cs
+C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\obj\Debug\net8.0\KoleosDemo.sourcelink.json
+C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\bin\Debug\net8.0\KoleosDemo.staticwebassets.runtime.json
+C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\Users\arath\source\repos\KoleosDemo\KoleosDemo\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.UI.dll

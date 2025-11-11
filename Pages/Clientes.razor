@@ -1,0 +1,101 @@
+@page "/clientes"
+@inject HttpClient Http
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Clientes</h3>
+    <div>
+        <input class="form-control form-control-sm d-inline-block me-2" style="width:200px" placeholder="Buscar..." @bind="search" />
+        <button class="btn btn-primary btn-sm" @onclick="OpenCreate">Nuevo</button>
+    </div>
+</div>
+
+    <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Telefono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (clientes == null)
+            {
+                <tr>
+                    <td colspan="4">Cargando...</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var c in clientes.Where(c => string.IsNullOrWhiteSpace(search) || c.NombreCompleto.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                {
+                    <tr>
+                        <td>@c.Id</td>
+                        <td>@c.NombreCompleto</td>
+                        <td>@c.Telefono</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => Edit(c)">Editar</button>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(c.Id)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <!-- Modal placeholder -->
+    @if (showCreate)
+    {
+        <div class="modal fade show d-block" style="background:rgba(0,0,0,0.3)">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Nuevo Cliente</h5>
+                        <button type="button" class="btn-close" @onclick="CloseCreate"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-2">
+                            <label class="form-label">Nombre</label>
+                            <input class="form-control" @bind="model.NombreCompleto" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Telefono</label>
+                            <input class="form-control" @bind="model.Telefono" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Correo</label>
+                            <input class="form-control" @bind="model.Correo" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CloseCreate">Cancelar</button>
+                        <button class="btn btn-primary" @onclick="Create">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+@code{
+    private List<Cliente>? clientes;
+    private string? search;
+    private bool showCreate = false;
+    private Cliente model = new Cliente();
+
+    protected override async Task OnInitializedAsync() => await Load();
+    private async Task Load() => clientes = await Http.GetFromJsonAsync<List<Cliente>>("/api/clientes");
+    private void OpenCreate() { model = new Cliente(); showCreate = true; }
+    private void CloseCreate() { showCreate = false; }
+    private async Task Create()
+    {
+        await Http.PostAsJsonAsync("/api/clientes", model);
+        showCreate = false;
+        await Load();
+    }
+    private void Edit(Cliente c) { /* left as exercise */ }
+    private async Task Delete(int id)
+    {
+        await Http.DeleteAsync($"/api/clientes/{id}");
+        await Load();
+    }
+}

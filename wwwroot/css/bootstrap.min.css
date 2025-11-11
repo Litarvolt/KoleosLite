@@ -1,0 +1,5 @@
+/* minimal placeholder to allow layout to load in dev; replace with official bootstrap in production */
+body{font-family:Segoe UI,Arial,Helvetica,sans-serif}
+.card{border:1px solid #ddd;border-radius:4px;margin-bottom:10px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:6px;border:1px solid #e9e9e9}

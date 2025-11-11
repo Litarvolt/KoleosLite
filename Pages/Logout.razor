@@ -1,0 +1,12 @@
+@page "/logout"
+@inject KoleosDemo.Services.SimpleAuthStateProvider AuthState
+@inject NavigationManager Nav
+
+<h3>Cerrando sesión...</h3>
+@code{
+ protected override void OnInitialized()
+ {
+ AuthState.MarkUserAsLoggedOut();
+ Nav.NavigateTo("/login");
+ }
+}

@@ -1,0 +1,17 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Nav
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="true">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(KoleosDemo.Pages.Shared.MainLayout)" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(KoleosDemo.Pages.Shared.MainLayout)">
+                <p>Page not found: @Nav.Uri</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

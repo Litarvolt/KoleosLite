@@ -1,0 +1,23 @@
+@page "/ordenes"
+@inject HttpClient Http
+
+<h3>Ordenes</h3>
+<button class="btn btn-primary" @onclick="Load">Cargar</button>
+<ul>
+ @if (ordenes == null)
+ {
+ <li>Cargando...</li>
+ }
+ else
+ {
+ foreach (var o in ordenes)
+ {
+ <li>@o.Id - @o.Estado - @o.FechaEntrada</li>
+ }
+ }
+</ul>
+
+@code{
+ private List<OrdenServicio>? ordenes;
+ private async Task Load() => ordenes = await Http.GetFromJsonAsync<List<OrdenServicio>>("/api/ordenes");
+}

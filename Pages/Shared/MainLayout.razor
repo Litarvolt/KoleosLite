@@ -1,0 +1,122 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthProvider
+@inherits LayoutComponentBase
+
+<div class="container-fluid">
+ <div class="row">
+ <div class="col-2 bg-light sidebar p-0" style="min-height:100vh">
+ <div class="d-flex align-items-center p-3 border-bottom">
+ <i class="fa-solid fa-tools fa-2x me-2" style="color:var(--accent)"></i>
+ <strong style="font-size:1.1rem">KoleosLite</strong>
+ </div>
+ <nav class="nav flex-column p-3">
+ <NavLink class="nav-link" href="/" Match="NavLinkMatch.All"><i class="fa-solid fa-chart-pie me-2"></i> Dashboard</NavLink>
+ <NavLink class="nav-link" href="/clientes"><i class="fa-solid fa-users me-2"></i> Clientes</NavLink>
+ <NavLink class="nav-link" href="/vehiculos"><i class="fa-solid fa-car me-2"></i> Vehiculos</NavLink>
+ <NavLink class="nav-link" href="/ordenes"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Ordenes</NavLink>
+ </nav>
+ <div class="mt-auto p-3 small text-muted">@((MarkupString)authArea)</div>
+ </div>
+ <div class="col-10 p-4">
+ <header class="d-flex justify-content-between align-items-center mb-4">
+ <div>
+ <h4 class="m-0">@Title</h4>
+ <div class="small-muted">Panel principal</div>
+ </div>
+ <div class="d-flex align-items-center">
+ <button class="btn btn-outline-secondary btn-sm me-2" title="Notificaciones"><i class="fa-solid fa-bell"></i></button>
+ <button class="btn btn-outline-secondary btn-sm me-2" title="Cambiar tema" @onclick="ToggleTheme"><i class="fa-solid fa-moon"></i></button>
+ <button class="btn btn-outline-secondary btn-sm" @onclick="OnProfileClick"> <i class="fa-solid fa-user me-1"></i> @userName</button>
+ </div>
+ </header>
+ <AuthorizeView>
+ <Authorized>
+ <main>
+ <div class="container-fluid">
+ @Body
+ </div>
+ </main>
+ </Authorized>
+ <NotAuthorized>
+ <div class="d-flex flex-column align-items-center justify-content-center" style="height:60vh">
+ <i class="fa-solid fa-lock fa-3x mb-3"></i>
+ <h4>Acceso restringido</h4>
+ <p class="text-muted">Debes iniciar sesión para acceder al panel</p>
+ <a class="btn btn-primary" href="/login">Iniciar sesión</a>
+ </div>
+ </NotAuthorized>
+ </AuthorizeView>
+ </div>
+ </div>
+</div>
+
+@code{
+ private string Title => GetTitleForPath(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
+ [Inject] NavigationManager NavigationManager { get; set; } = null!;
+
+ private string GetTitleForPath(string relativePath)
+ {
+ // Normalize and remove query/fragment
+ var path = relativePath?.Split('?', '#').FirstOrDefault() ?? string.Empty;
+ path = path.Trim('/').ToLowerInvariant();
+ return path switch
+ {
+ "clientes" => "Clientes",
+ "vehiculos" => "Vehiculos",
+ "ordenes" => "Ordenes",
+ "" => "Dashboard",
+ _ => "Dashboard",
+ };
+ }
+
+ private string authArea = "";
+ private string userName = "Guest";
+
+ protected override async Task OnInitializedAsync()
+ {
+ // subscribe to auth changes
+ AuthProvider.AuthenticationStateChanged += OnAuthChanged;
+ await UpdateAuthArea();
+ }
+
+ private async Task UpdateAuthArea()
+ {
+ var state = await AuthProvider.GetAuthenticationStateAsync();
+ var user = state.User;
+ if (user.Identity?.IsAuthenticated ?? false)
+ {
+ userName = user.Identity.Name ?? "user";
+ authArea = $"Logged as <strong>{userName}</strong> <button class=\"btn btn-sm btn-link\" onclick=\"location.href='/logout'\">Salir</button>";
+ }
+ else
+ {
+ userName = "Guest";
+ authArea = "<a href=\"/login\">Iniciar sesión</a>";
+ }
+ StateHasChanged();
+ }
+
+ private void OnAuthChanged(Task<AuthenticationState> stateTask)
+ {
+ // fire and forget
+ _ = UpdateAuthArea();
+ }
+
+ private void OnProfileClick()
+ {
+ NavigationManager.NavigateTo("/login");
+ }
+
+ private async Task ToggleTheme()
+ {
+ try { await JS.InvokeVoidAsync("theme.toggle"); } catch { }
+ }
+
+ public void Dispose()
+ {
+ AuthProvider.AuthenticationStateChanged -= OnAuthChanged;
+ }
+}}

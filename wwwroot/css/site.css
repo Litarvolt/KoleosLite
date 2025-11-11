@@ -1,0 +1,45 @@
+/* Animations and small UI enhancements */
+.card { transition: transform .15s ease, box-shadow .15s ease; }
+.card:hover { transform: translateY(-4px); box-shadow:06px16px rgba(0,0,0,0.08); }
+.nav-link { transition: background-color .12s ease, color .12s ease; }
+.nav-link:hover { background-color: rgba(0,0,0,0.03); }
+.sidebar { background: linear-gradient(180deg,#ffffff,#f8f9fb); }
+
+:root{
+ --bg:#f6f8fb; --text:#1f2937; --muted:#6b7280; --card:#ffffff; --sidebar:#ffffff; --accent:#0d6efd;
+}
+:root.theme-dark, .theme-dark {
+ --bg:#0b1220; --text:#e6eef6; --muted:#93a6b1; --card:#0c1320; --sidebar:#071018; --accent:#4da3ff;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;margin:0}
+/* Sidebar */
+.sidebar{background:var(--sidebar);box-shadow:2px06px rgba(16,24,40,0.04)}
+.sidebar .nav-link{color:var(--muted);padding:12px;border-radius:6px;margin-bottom:6px}
+.sidebar .nav-link.active{color:var(--accent);background:rgba(13,110,253,0.06);font-weight:700}
+
+/* Header */
+.auth-card{width:420px;border-radius:12px;border:none}
+.auth-background{background:linear-gradient(180deg,#eef2ff,transparent);}
+.auth-card .card-body{padding:28px}
+
+/* Cards */
+.card{background:var(--card);color:var(--text);border-radius:12px;margin-bottom:18px;padding:16px;box-shadow:06px18px rgba(15,23,42,0.06)}
+.card-compact{padding:12px}
+
+/* Table */
+.table{background:transparent}
+.table th{color:var(--muted);font-weight:600}
+.table td{vertical-align:middle}
+
+/* Buttons */
+.btn-primary{background:var(--accent);border-color:var(--accent)}
+
+/* Animations */
+.card:hover{transform:translateY(-6px);transition:transform .18s ease, box-shadow .18s ease}
+
+/* Responsive */
+@media (max-width:992px){.col-2{display:none}.col-10{flex:11100%;max-width:100%}.sidebar{display:none}}
+
+/* Small helpers */
+.small-muted{color:var(--muted);font-size:0.85rem}

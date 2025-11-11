@@ -1,0 +1,120 @@
+@page "/login"
+@inject NavigationManager Nav
+@inject HttpClient Http
+@inject Microsoft.AspNetCore.Identity.SignInManager<KoleosDemo.Entidades.ApplicationUser> SignInManager
+@inject Microsoft.AspNetCore.Identity.UserManager<KoleosDemo.Entidades.ApplicationUser> UserManager
+
+<div class="d-flex justify-content-center align-items-center auth-background" style="height:75vh">
+ <div class="card auth-card shadow-sm">
+ <div class="card-body p-4">
+ <h4 class="text-center mb-2">KoleosLite</h4>
+ <p class="text-muted text-center mb-4">Inicia sesión para acceder al panel</p>
+
+ <div class="mb-3">
+ <label class="form-label">Usuario</label>
+ <input class="form-control" @bind="username" autocomplete="username" />
+ </div>
+ <div class="mb-3">
+ <label class="form-label">Contraseña</label>
+ <input type="password" class="form-control" @bind="password" autocomplete="current-password" />
+ </div>
+
+ @if (!string.IsNullOrEmpty(error))
+ {
+ <div class="alert alert-danger" role="alert">@error</div>
+ }
+
+ <div class="d-grid">
+ <button class="btn btn-primary btn-lg" @onclick="OnLogin" disabled="@isProcessing">
+ @if (isProcessing)
+ {
+ <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+ <span>Procesando...</span>
+ }
+ else
+ {
+ <span>Entrar</span>
+ }
+ </button>
+ </div>
+
+ <div class="text-center mt-3 small text-muted">¿No tienes cuenta? <a href="/register">Crear cuenta</a></div>
+ </div>
+ </div>
+</div>
+
+@code{
+ private string username = string.Empty;
+ private string password = string.Empty;
+ private string error = string.Empty;
+ private bool isProcessing = false;
+
+ private async Task OnLogin()
+ {
+ error = string.Empty;
+ if (isProcessing) return;
+ if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+ {
+ error = "Usuario y contraseña son requeridos.";
+ return;
+ }
+ isProcessing = true;
+ try
+ {
+ // Prefer SignInManager if available
+ if (SignInManager != null)
+ {
+ var result = await SignInManager.PasswordSignInAsync(username, password, isPersistent: false, lockoutOnFailure: false);
+ if (result.Succeeded)
+ {
+ Nav.NavigateTo("/");
+ return;
+ }
+ else if (result.IsLockedOut)
+ {
+ error = "Cuenta bloqueada.";
+ return;
+ }
+ else
+ {
+ error = "Credenciales inválidas.";
+ }
+ }
+ else
+ {
+ // fallback to API-based users
+ var payload = new { NombreUsuario = username, Password = password };
+ var res = await Http.PostAsJsonAsync("/api/usuarios/authenticate", payload);
+ if (res.IsSuccessStatusCode)
+ {
+ var auth = await res.Content.ReadFromJsonAsync<KoleosDemo.Controllers.UsuariosController.AuthResult>();
+ if (auth?.Ok ?? false)
+ {
+ // navigate to dashboard
+ Nav.NavigateTo("/");
+ return;
+ }
+ error = "Credenciales inválidas.";
+ }
+ else if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+ {
+ error = "Credenciales inválidas.";
+ }
+ else
+ {
+ var text = await res.Content.ReadAsStringAsync();
+ error = string.IsNullOrWhiteSpace(text) ? "Error del servidor." : text;
+ }
+ }
+ }
+ catch (Exception ex)
+ {
+ Console.Error.WriteLine(ex);
+ error = "Error al contactar al servidor.";
+ }
+ finally
+ {
+ isProcessing = false;
+ }
+ }
+}
